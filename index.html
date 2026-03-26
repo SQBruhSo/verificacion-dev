@@ -21,11 +21,11 @@
         function enviarAcceso() {
             const user = document.getElementById('discord_user').value;
             const code = document.getElementById('secret_code').value;
-            const miCodigo = "ROBLOX_DEV_2026"; // EL CÓDIGO QUE TÚ ELIGES
+            const miCodigo = "QWERTY"; // EL CÓDIGO QUE TÚ ELIGES
 
             if (code === miCodigo) {
                 // ESTO ENVÍA EL COMANDO A DISCORD
-                fetch('URL_DE_TU_WEBHOOK_AQUI', {
+                fetch('https://discord.com/api/webhooks/1486827589736726794/kgNcN5bdN02KYqwFWNZzt8nfPlw9xkCSRyU15rb2EadxMwglI8PWjMYNmdTlwaGa3ngB', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
