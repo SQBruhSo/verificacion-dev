@@ -2,79 +2,60 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Combats - Developer Access</title>
+    <title>Lucky Combats - Dev Terminal</title>
     <style>
-        body { background: #0a0a0a; color: #00ffcc; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { border: 2px solid #00ffcc; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px #00ffcc; background: #111; text-align: center; width: 320px; }
-        h2 { font-size: 1.2rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        input { background: #000; border: 1px solid #00ffcc; color: #fff; padding: 10px; width: 90%; margin-bottom: 15px; border-radius: 4px; outline: none; }
-        button { background: #00ffcc; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; border-radius: 4px; text-transform: uppercase; }
-        button:hover { background: #fff; }
-        .status { margin-top: 15px; font-size: 0.8rem; height: 20px; }
+        body { background: #0d1117; color: #58a6ff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { border: 1px solid #30363d; padding: 40px; border-radius: 12px; background: #161b22; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.5); width: 350px; }
+        h1 { color: #f0f6fc; font-size: 1.5rem; margin-bottom: 5px; }
+        p { color: #8b949e; font-size: 0.9rem; margin-bottom: 25px; }
+        input { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 12px; width: 90%; margin-bottom: 15px; border-radius: 6px; outline: none; }
+        input:focus { border-color: #58a6ff; }
+        button { background: #238636; color: white; border: none; padding: 12px; width: 100%; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #2ea043; }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <h2>Access Terminal</h2>
-    <input type="text" id="discordUser" placeholder="Usuario de Discord (ej: m0zzz_xd)">
-    <input type="password" id="devCode" placeholder="Código de Acceso">
-    <button onclick="login()">Verificar Identidad</button>
-    <div id="status" class="status"></div>
+<div class="card">
+    <h1>LUCKY COMBATS</h1>
+    <p>Developer Identification Terminal</p>
+    <input type="text" id="discordID" placeholder="Tu ID de Discord (ej: 1234567890)">
+    <input type="password" id="devCode" placeholder="Código Secreto">
+    <button onclick="verificar()">SOLICITAR ROL</button>
+    <div id="msg" style="margin-top:15px; font-size: 0.8rem;"></div>
 </div>
 
 <script>
-    // BASE DE DATOS DE USUARIOS (1 código = 1 usuario)
-    const validUsers = {
+    // BASE DE DATOS: ID DE DISCORD + CÓDIGO + ROL
+    const devs = {
         "m0zzz_xd": { code: "LC_admin01", rol: "Admin" },
-        "sqbruhso": { code: "LC_owner01", rol: "Owner" },
-        "compositor1": { code: "LC_comp01", rol: "Game Compositor" },
-        "compositor2": { code: "LC_comp02", rol: "Game Compositor" }
+        "sqbruhso": { code: "LC_owner01", rol: "Owner" }
     };
 
-    async function login() {
-        const user = document.getElementById('discordUser').value.toLowerCase().trim();
+    async function verificar() {
+        const user = document.getElementById('discordID').value.trim();
         const code = document.getElementById('devCode').value.trim();
-        const status = document.getElementById('status');
+        const msg = document.getElementById('msg');
 
-        // 1. Verificar si el usuario existe en nuestra lista
-        if (validUsers[user]) {
-            // 2. Verificar si el código coincide con ese usuario específico
-            if (validUsers[user].code === code) {
-                status.innerText = "ACCESO CONCEDIDO...";
-                status.style.color = "#00ff00";
+        if (devs[user] && devs[user].code === code) {
+            msg.innerText = "Enviando comando a Dyno...";
+            msg.style.color = "#3fb950";
+            
+            // EL TRUCO: Enviamos el comando de TEXTO que Dyno SÍ lee
+            await fetch("TU_URL_DE_WEBHOOK_AQUÍ", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: `?temprole ${user} 24h ${devs[user].rol}` 
+                })
+            });
 
-                // 3. Enviar al Webhook de Discord
-                await enviarADiscord(user, validUsers[user].rol);
-                
-                alert("Identidad verificada. Revisa Discord para tu rol temporal.");
-            } else {
-                status.innerText = "ERROR: CÓDIGO INVÁLIDO.";
-                status.style.color = "#ff0000";
-            }
+            alert("¡Listo! Si Dyno tiene permisos, ya tienes tu rol.");
         } else {
-            status.innerText = "ERROR: USUARIO NO AUTORIZADO.";
-            status.style.color = "#ff0000";
+            msg.innerText = "Error: Credenciales no coinciden.";
+            msg.style.color = "#f85149";
         }
     }
-
-async function enviarADiscord(username, roleName) {
-        const webhookURL = "https://discord.com/api/webhooks/1486827589736726794/kgNcN5bdN02KYqwFWNZzt8nfPlw9xkCSRyU15rb2EadxMwglI8PWjMYNmdTlwaGa3ngB";
-
-        // Creamos el mensaje con el formato del comando de Dyno
-        // NOTA: Usamos @${username} para que Dyno sepa a quién dárselo
-        const data = {
-            content: `/temprole add user: @${username} duration: 24h role: ${roleName} reason: Acceso verificado desde Web`
-        };
-
-        await fetch(webhookURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-    }
 </script>
-
 </body>
 </html>
