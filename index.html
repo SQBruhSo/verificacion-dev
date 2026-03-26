@@ -1,41 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Verificación de Desarrolladores</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Combats - Developer Access</title>
     <style>
-        body { background: #1e1e2f; color: white; font-family: sans-serif; text-align: center; }
-        .box { margin-top: 50px; padding: 20px; border: 2px solid #5865f2; display: inline-block; border-radius: 10px; }
-        input { display: block; margin: 10px auto; padding: 8px; border-radius: 5px; border: none; }
-        button { background: #5865f2; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
+        body { background: #0a0a0a; color: #00ffcc; font-family: 'Courier New', Courier, monospace; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { border: 2px solid #00ffcc; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px #00ffcc; background: #111; text-align: center; width: 320px; }
+        h2 { font-size: 1.2rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        input { background: #000; border: 1px solid #00ffcc; color: #fff; padding: 10px; width: 90%; margin-bottom: 15px; border-radius: 4px; outline: none; }
+        button { background: #00ffcc; color: #000; border: none; padding: 10px 20px; font-weight: bold; cursor: pointer; width: 100%; border-radius: 4px; text-transform: uppercase; }
+        button:hover { background: #fff; }
+        .status { margin-top: 15px; font-size: 0.8rem; height: 20px; }
     </style>
 </head>
 <body>
-    <div class="box">
-        <h2>Acceso al Servidor de Desarrollo</h2>
-        <input type="text" id="discord_user" placeholder="Tu Usuario de Discord (Nombre#0000)">
-        <input type="password" id="secret_code" placeholder="Código de Acceso">
-        <button onclick="enviarAcceso()">Verificar y Entrar</button>
-    </div>
 
-    <script>
-        function enviarAcceso() {
-            const user = document.getElementById('discord_user').value;
-            const code = document.getElementById('secret_code').value;
-            const miCodigo = "QWERTY"; // EL CÓDIGO QUE TÚ ELIGES
+<div class="login-card">
+    <h2>Access Terminal</h2>
+    <input type="text" id="discordUser" placeholder="Usuario de Discord (ej: m0zzz_xd)">
+    <input type="password" id="devCode" placeholder="Código de Acceso">
+    <button onclick="login()">Verificar Identidad</button>
+    <div id="status" class="status"></div>
+</div>
 
-            if (code === miCodigo) {
-                // ESTO ENVÍA EL COMANDO A DISCORD
-                fetch('https://discord.com/api/webhooks/1486827589736726794/kgNcN5bdN02KYqwFWNZzt8nfPlw9xkCSRyU15rb2EadxMwglI8PWjMYNmdTlwaGa3ngB', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        content: `!temp ${user} 24h Acceso-Verificado`
-                    })
-                }).then(() => alert("¡Solicitud enviada! Revisa Discord."));
+<script>
+    // BASE DE DATOS DE USUARIOS (1 código = 1 usuario)
+    const validUsers = {
+        "m0zzz_xd": { code: "LC_admin01", rol: "Admin" },
+        "sqbruhso": { code: "LC_owner01", rol: "Owner" },
+        "compositor1": { code: "LC_comp01", rol: "Game Compositor" },
+        "compositor2": { code: "LC_comp02", rol: "Game Compositor" }
+    };
+
+    async function login() {
+        const user = document.getElementById('discordUser').value.toLowerCase().trim();
+        const code = document.getElementById('devCode').value.trim();
+        const status = document.getElementById('status');
+
+        // 1. Verificar si el usuario existe en nuestra lista
+        if (validUsers[user]) {
+            // 2. Verificar si el código coincide con ese usuario específico
+            if (validUsers[user].code === code) {
+                status.innerText = "ACCESO CONCEDIDO...";
+                status.style.color = "#00ff00";
+
+                // 3. Enviar al Webhook de Discord
+                await enviarADiscord(user, validUsers[user].rol);
+                
+                alert("Identidad verificada. Revisa Discord para tu rol temporal.");
             } else {
-                alert("Código incorrecto.");
+                status.innerText = "ERROR: CÓDIGO INVÁLIDO.";
+                status.style.color = "#ff0000";
             }
+        } else {
+            status.innerText = "ERROR: USUARIO NO AUTORIZADO.";
+            status.style.color = "#ff0000";
         }
-    </script>
+    }
+
+    async function enviarADiscord(username, roleName) {
+        // REEMPLAZA ESTO CON TU URL DE WEBHOOK DE DISCORD
+        const webhookURL = "https://discord.com/api/webhooks/1486827589736726794/kgNcN5bdN02KYqwFWNZzt8nfPlw9xkCSRyU15rb2EadxMwglI8PWjMYNmdTlwaGa3ngB";
+
+        const data = {
+            content: `🔑 **NUEVO ACCESO DETECTADO**\n👤 **Usuario:** ${username}\n🎭 **Rol:** ${roleName}\n⏰ **Duración:** 24 Horas\n\n*Por favor, administrador, usa un bot para asignar el rol temporalmente.*`
+        };
+
+        await fetch(webhookURL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    }
+</script>
+
 </body>
 </html>
