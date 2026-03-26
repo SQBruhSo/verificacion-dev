@@ -59,12 +59,13 @@
         }
     }
 
-    async function enviarADiscord(username, roleName) {
-        // REEMPLAZA ESTO CON TU URL DE WEBHOOK DE DISCORD
-        const webhookURL = "https://discord.com/api/webhooks/1486827589736726794/kgNcN5bdN02KYqwFWNZzt8nfPlw9xkCSRyU15rb2EadxMwglI8PWjMYNmdTlwaGa3ngB";
+async function enviarADiscord(username, roleName) {
+        const webhookURL = "TU_URL_DE_WEBHOOK_AQUÍ";
 
+        // Creamos el mensaje con el formato del comando de Dyno
+        // NOTA: Usamos @${username} para que Dyno sepa a quién dárselo
         const data = {
-            content: `🔑 **NUEVO ACCESO DETECTADO**\n👤 **Usuario:** ${username}\n🎭 **Rol:** ${roleName}\n⏰ **Duración:** 24 Horas\n\n*Por favor, administrador, usa un bot para asignar el rol temporalmente.*`
+            content: `/temprole add user: @${username} duration: 24h role: ${roleName} reason: Acceso verificado desde Web`
         };
 
         await fetch(webhookURL, {
